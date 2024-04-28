@@ -80,8 +80,7 @@ public class STHash<Key, Value> implements Iterable<Key> {
         for (i = (i + 1) % m; keys[i] != null; i = (i + 1) % m) {
             Key temp1 = keys[i];
             Value temp2 = vals[i];
-            vals[i] = null;
-            keys[i] = null;
+            delete(keys[i]);
             put(temp1, temp2);
         }
         n--;
@@ -115,14 +114,18 @@ public class STHash<Key, Value> implements Iterable<Key> {
     public static void main(String[] args) {
         // Crear una tabla de dispersión con un tamaño inicial de 10
         STHash<String, Integer> hashTable = new STHash<>(10);
-
+        System.out.println("Tamaño de la tabla: " + hashTable.size());
         // Agregar elementos a la tabla
         hashTable.put("a", 1);
         hashTable.put("b", 2);
         hashTable.put("c", 3);
         hashTable.put("d", 4);
         hashTable.put("e", 5);
-
+        // Iterar sobre las claves de la tabla
+        System.out.println("Claves en la tabla:");
+        for (String key : hashTable) {
+            System.out.println(key);
+        }
         // Imprimir el tamaño de la tabla
         System.out.println("Tamaño de la tabla: " + hashTable.size());
 
