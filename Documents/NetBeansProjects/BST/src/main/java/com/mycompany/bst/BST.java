@@ -4,11 +4,8 @@
 package com.mycompany.bst;
 
 import java.util.Iterator;
+import java.util.Scanner;
 
-/**
- *
- * @author ACER
- */
 /**
  *
  * @author USUARIO
@@ -106,6 +103,16 @@ public class BST<Key extends Comparable<Key>, Value> implements Iterable<Key> {
         return false;
     }
 
+    public Nodo min(Nodo raiz) {
+        if (raiz == null) {
+            return null;
+        }
+        if (raiz.left == null) {
+            return raiz;
+        }
+        return min(raiz.left);
+    }
+
     public void deleteMin() {
         root = deleteMin(root);
     }
@@ -141,7 +148,10 @@ public class BST<Key extends Comparable<Key>, Value> implements Iterable<Key> {
                     raiz = raiz.left;
                 }
                 //Ambos hijos tienen subarboles
-
+                Nodo temp = raiz;
+                raiz = min(temp.right);
+                raiz.right = deleteMin(temp.right);
+                raiz.left = temp.left;
             } else if (cmp < 0) {
                 raiz.left = delete(key, raiz.left);
             } else {
@@ -152,6 +162,21 @@ public class BST<Key extends Comparable<Key>, Value> implements Iterable<Key> {
     }
 
     public boolean contains(Key key) {
+        return contains(root, key);
+    }
+
+    public boolean contains(Nodo root, Key key) {
+
+        int cmp = root.key.compareTo(key);
+        if (cmp == 0) {
+            return true;
+        }
+        if (cmp > 0 && root.left != null) {
+            return contains(root.left, key);
+        }
+        if (cmp < 0 && root.right != null) {
+            return contains(root.right, key);
+        }
         return false;
     }
 
@@ -169,115 +194,6 @@ public class BST<Key extends Comparable<Key>, Value> implements Iterable<Key> {
         }
         return 1 + size(raiz.left) + size(raiz.right);
     }
-
-    public Key ceiling(Key key) {
-        Nodo result = ceiling(root, key);
-        if (result == null) {
-            return null;
-        }
-        return result.key;
-    }
-
-    private Nodo ceiling(Nodo node, Key key) {
-        if (node == null) {
-            return null;
-        }
-
-        int cmp = key.compareTo(node.key);
-        if (cmp == 0) {
-            return node; // La clave exacta fue encontrada
-        } else if (cmp > 0) {
-            // Si la clave dada es mayor, el techo debe estar en el subárbol derecho
-            return ceiling(node.right, key);
-        } else {
-            // Si la clave dada es menor, el techo podría ser este nodo o en el subárbol izquierdo
-            Nodo leftCeiling = ceiling(node.left, key);
-            if (leftCeiling != null) {
-                return leftCeiling;
-            } else {
-                return node;
-            }
-        }
-    }
-    
-    public int rank(Key key) {
-        return rank(key, root);
-    }
-
-    private int rank(Key key, Nodo node) {
-        if (node == null) return 0;
-        
-        int cmp = key.compareTo(node.key);
-        if (cmp < 0) {
-            return rank(key, node.left);
-        } else if (cmp > 0) {
-            return 1 + size(node.left) + rank(key, node.right);
-        } else {
-            return size(node.left);
-        }
-    }
-
-    public Key floor(Key key) {
-        Nodo result = floor(root, key);
-        if (result == null) {
-            return null;
-        }
-        return result.key;
-    }
-
-    private Nodo floor(Nodo node, Key key) {
-        if (node == null) {
-            return null;
-        }
-
-        int cmp = key.compareTo(node.key);
-        if (cmp == 0) {
-            // La clave exacta fue encontrada
-            return node;
-        } else if (cmp < 0) {
-            // Si la clave dada es menor, el piso debe estar en el subárbol izquierdo
-            return floor(node.left, key);
-        } else {
-            // Si la clave dada es mayor, el piso podría ser este nodo o en el subárbol derecho
-            Nodo rightFloor = floor(node.right, key);
-            if (rightFloor != null) {
-                return rightFloor;
-            } else {
-                return node;
-            }
-        }
-    }
-    
-    public Key max() {
-        if (root == null) {
-            return null; // o lanzar una excepción si es preferible
-        }
-        return max(root).key;
-    }
-
-    private Nodo max(Nodo node) {
-        if (node.right == null) {
-            return node;
-        } else {
-            return max(node.right);
-        }
-    }
-
-    public Key min() {
-        if (root == null) {
-            return null;
-        }
-        return min(root).key;
-    }
-
-    private Nodo min(Nodo node) {
-        if (node.left == null) {
-            return node;
-        } else {
-            return min(node.left);
-        }
-    }
-    
 
     //Iterador
     public Iterator<Key> iterator() {
@@ -312,50 +228,187 @@ public class BST<Key extends Comparable<Key>, Value> implements Iterable<Key> {
         System.out.println("--------------------");
         mostrarDatos(root);
     }
-    
-    public static void main(String[] args) {
-        // Crear un árbol binario de búsqueda
-        BST<Integer, String> bst = new BST<>();
 
-        // Insertar elementos en el árbol
-        bst.put(50, "Cincuenta");
-        bst.put(30, "Treinta");
-        bst.put(70, "Setenta");
-        bst.put(20, "Veinte");
-        bst.put(40, "Cuarenta");
-        bst.put(60, "Sesenta");
-        bst.put(80, "Ochenta");
-
-        // Mostrar los datos del árbol
-        bst.mostrarDatos();
-
-        // Buscar un elemento en el árbol
-        int keyToFind = 40;
-        String value = bst.get(keyToFind);
-        if (value != null) {
-            System.out.println("Valor encontrado para la clave " + keyToFind + ": " + value);
-        } else {
-            System.out.println("No se encontró ningún valor para la clave " + keyToFind);
-        }
-
-        // Eliminar un elemento del árbol
-        int keyToDelete = 20;
-        bst.delete(keyToDelete);
-        System.out.println("Después de eliminar la clave " + keyToDelete + ":");
-        bst.mostrarDatos();
-
-        // Obtener el mínimo y el máximo
-        System.out.println("El mínimo es: " + bst.min());
-        System.out.println("El máximo es: " + bst.max());
-
-        // Obtener el techo y el piso para una clave
-        int keyCeilingFloor = 55;
-        System.out.println("El techo para la clave " + keyCeilingFloor + " es: " + bst.ceiling(keyCeilingFloor));
-        System.out.println("El piso para la clave " + keyCeilingFloor + " es: " + bst.floor(keyCeilingFloor));
-
-        // Obtener el rango de una clave
-        int keyRank = 35;
-        System.out.println("El rango para la clave " + keyRank + " es: " + bst.rank(keyRank));
+    public Nodo getNodo(Key key) {
+        return getNodo(key, root);
     }
 
+    public Nodo getNodo(Key key, Nodo raiz) {
+        if (raiz == null) {
+            return null;
+        }
+        int cmp = key.compareTo(raiz.key);
+        if (cmp == 0) {
+            return raiz;
+        }
+        if (cmp < 0) {
+            return getNodo(key, raiz.left);
+        }
+        return getNodo(key, raiz.right);
+
+    }
+
+    public boolean esHoja(Key key) {
+        Nodo temp = getNodo(key, root);
+        if (temp == null) {
+            return false;
+        }
+        if (temp.left == null && temp.right == null) {
+            return true;
+        }
+        return false;
+    }
+
+    public int altura(Key key) {
+        if (!contains(key)) {
+            return 0;
+        }
+
+        return altura(key, root);
+    }
+
+    private int altura(Key key, Nodo raiz) {
+
+        int cmp = key.compareTo(raiz.key);
+        if (cmp == 0) {
+            return 1;
+        }
+        if (cmp < 0) {
+            return 1 + altura(key, raiz.left);
+        }
+        return 1 + altura(key, raiz.right);
+
+    }
+
+    public boolean hayCamino(Key key1, Key key2) {
+        if (!contains(key1) || !contains(key2)) {
+            System.out.println("Una de las llaves dadas no existe en el arbol");
+            return false;
+        }
+        if (altura(key1) < altura(key2)) {
+            return hayCamino(key2, getNodo(key1));
+        }
+        return hayCamino(key1, getNodo(key2));
+    }
+
+    public boolean hayCamino(Key key, Nodo raiz) {
+
+        if (raiz == null) {
+            System.out.println("No hay camino");
+            return false;
+        }
+        int cmp = key.compareTo(raiz.key);
+        if (cmp == 0) {
+            return true;
+        }
+
+        if (cmp < 0) {
+            return hayCamino(key, raiz.left);
+        }
+        return hayCamino(key, raiz.right);
+    }
+
+    public String mostrarCamino(Key key1, Key key2) {
+        if (!hayCamino(key1, key2)) {
+            return null;
+        }
+        if (altura(key1) < altura(key2)) {
+            Nodo temp = getNodo(key1);
+            return mostrarCamino(key2, temp);
+        }
+        Nodo temp = getNodo(key2);
+        return mostrarCamino(key1, temp);
+    }
+
+    public String mostrarCamino(Key key, Nodo raiz) {
+        int cmp = key.compareTo(raiz.key);
+        if (cmp == 0) {
+            return (String) raiz.value;
+        }
+
+        if (cmp < 0) {
+            return raiz.value + "-" + mostrarCamino(key, raiz.left);
+        }
+        return raiz.value+ "-" + mostrarCamino(key, raiz.right);
+    }
+
+    public int longitudCamino(Key key1, Key key2) {
+        if (!hayCamino(key1, key2)) {
+            return 0;
+        }
+        if (altura(key1) < altura(key2)) {
+            Nodo temp = getNodo(key1);
+            return longitudCamino(key2, temp);
+        }
+        Nodo temp = getNodo(key2);
+        return longitudCamino(key1, temp);
+    }
+
+    public int longitudCamino(Key key, Nodo raiz) {
+        int cmp = key.compareTo(raiz.key);
+        if (cmp == 0) {
+            return 0;
+        }
+
+        if (cmp < 0) {
+            return 1 + longitudCamino(key, raiz.left);
+        }
+        return 1 + longitudCamino(key, raiz.right);
+    }
+    
+    
+    public boolean esDesendiente(Key key1, Key key2){
+        // Compara las alturas de los nodos
+        return altura(key1) < altura(key2) && hayCamino(key1, key2);
+    }
+    
+//    public Iterable<Key> keys() {
+//        //return keys(min(), max());
+//        return null;
+//    }
+//
+//    public Iterable<Key> keys(Key lo, Key hi) {
+//        Queue<Key> queue = new Queue<Key>();
+//        keys(root, queue, lo, hi);
+//        return queue;
+//    }
+//
+//    private void keys(Nodo raiz, Queue<Key> queue, Key lo, Key hi) {
+//        if (raiz == null) {
+//            return;
+//        }
+//        int cmplo = lo.compareTo(raiz.key);
+//        int cmphi = hi.compareTo(raiz.key);
+//        if (cmplo < 0) {
+//            keys(raiz.left, queue, lo, hi);
+//        }
+//        if (cmplo <= 0 && cmphi >= 0) {
+//            queue.add(raiz.key);
+//        }
+//        if (cmphi > 0) {
+//            keys(raiz.right, queue, lo, hi);
+//        }
+//    }
+    public static void main(String[] args) {
+        BST<Integer, String> rara = new BST();
+        System.out.println("Size del arbol vacio: " + rara.size());
+        rara.put(2, "2");
+        rara.put(3, "3");
+        rara.put(0, "0");
+        rara.put(1, "1");
+        System.out.println(rara.root.value);
+        System.out.println(rara.root.right.value);
+        System.out.println(rara.root.left.value);
+        System.out.println(rara.root.left.right.value);
+        System.out.println("Size luego de agregar 4 elementos al arbol: " + rara.size());
+        System.out.println("¿Contiene la llave 3?: " + rara.contains(3));
+        System.out.println("2 es hoja?" + rara.esHoja(2));
+        System.out.println("3 es hoja?" + rara.esHoja(3));
+        System.out.println("0 es hoja?" + rara.esHoja(0));
+        System.out.println("1 es hoja?" + rara.esHoja(1));
+        System.out.println("Hay camino entre 2 y 1?" + rara.hayCamino(2, 1));
+        System.out.println("Mostrar camino entre 2 y 1: " + rara.mostrarCamino(2,1));
+        System.out.println("Longitud del camino entre 2 y 1: " +  rara.longitudCamino(2, 1));
+        System.out.println("1 es de descendiente de 2?: " + rara.esDesendiente(2, 1));
+    }
 }
