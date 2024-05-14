@@ -329,7 +329,7 @@ public class BST<Key extends Comparable<Key>, Value> implements Iterable<Key> {
         if (cmp < 0) {
             return raiz.value + "-" + mostrarCamino(key, raiz.left);
         }
-        return raiz.value+ "-" + mostrarCamino(key, raiz.right);
+        return raiz.value + "-" + mostrarCamino(key, raiz.right);
     }
 
     public int longitudCamino(Key key1, Key key2) {
@@ -355,40 +355,252 @@ public class BST<Key extends Comparable<Key>, Value> implements Iterable<Key> {
         }
         return 1 + longitudCamino(key, raiz.right);
     }
-    
-    
-    public boolean esDesendiente(Key key1, Key key2){
+
+    public boolean esDesendiente(Key key1, Key key2) {
         // Compara las alturas de los nodos
         return altura(key1) < altura(key2) && hayCamino(key1, key2);
     }
-    
-//    public Iterable<Key> keys() {
-//        //return keys(min(), max());
-//        return null;
+
+    public int altura() {
+        return 1 + altura(root);
+    }
+
+    public int altura(Nodo raiz) {
+        int left = 0;
+        int right = 0;
+
+        if (raiz.left == null && raiz.right == null) {
+            return 0;
+        }
+
+        if (raiz.left != null && raiz.right == null) {
+            return 1 + altura(raiz.left);
+        }
+        if (raiz.right != null && raiz.left == null) {
+            return 1 + altura(raiz.right);
+        }
+        left = 1 + altura(raiz.left);
+        right = 1 + altura(raiz.right);
+        if (left > right) {
+            return left;
+        }
+        return right;
+
+    }
+
+    public int alturaMin() {
+        return 1 + alturaMin(root);
+    }
+
+    public int alturaMin(Nodo raiz) {
+        int left = 0;
+        int right = 0;
+
+        if (raiz.left == null && raiz.right == null) {
+            return 0;
+        }
+
+        if (raiz.left != null && raiz.right == null) {
+            return 1 + altura(raiz.left);
+        }
+        if (raiz.right != null && raiz.left == null) {
+            return 1 + altura(raiz.right);
+        }
+        left = 1 + altura(raiz.left);
+        right = 1 + altura(raiz.right);
+        if (left < right) {
+            return left;
+        }
+        return right;
+    }
+
+    public int peso(Key key) {
+        Nodo raiz = getNodo(key);
+        if (raiz == null) {
+            return 0;
+        }
+        return size(raiz);
+    }
+
+    public boolean esCompleto() {
+        if (root == null) {
+            return true;
+        }
+        if (esCompleto(root) > 0) {
+            return false;
+        }
+        return true;
+
+    }
+
+    public int esCompleto(Nodo raiz) {
+
+        if (raiz.left == null && raiz.right != null) {
+            return 1;
+        }
+
+        if (raiz.left != null && raiz.right == null) {
+            return 1;
+        }
+
+        if (raiz.left == null && raiz.right == null) {
+            return 0;
+        }
+        return esCompleto(raiz.left) + esCompleto(raiz.right);
+
+    }
+
+    //1. saber si es completo
+    //2. el nivel menos y mayor
+    //3. mirar si el nivel mayor y el menor son iguales
+    public boolean estaLleno() {
+        if (!esCompleto()) {
+            return false;
+        }
+        if (altura() != alturaMin()) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean esCasiLleno() {
+        int altura = altura();
+        if (altura != alturaMin()) {
+            return false;
+        }
+        return esCasiLleno(root, altura - 1);
+    }
+
+    private boolean esCasiLleno(Nodo raiz, int altura) {
+        if (raiz == null) {
+            return true;
+        }
+        if (raiz.left == null && raiz.right == null) {
+            return true;
+        }
+        if (raiz.left != null && raiz.right != null) {
+            return esCasiLleno(raiz.left, altura - 1) && esCasiLleno(raiz.right, altura - 1);
+        }
+        if (raiz.right == null && raiz.left != null && altura == 1) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean sonIguales(Nodo raiz1, Nodo raiz2) {
+        // Si ambos nodos son nulos, son iguales
+        if (raiz1 == null && raiz2 == null) {
+            return true;
+        }
+        // Si solo uno de los nodos es nulo, los árboles no son iguales
+        if (raiz1 == null || raiz2 == null) {
+            return false;
+        }
+        // Compara las claves de los nodos actuales usando compareTo
+        int cmp = raiz1.key.compareTo(raiz2.key);
+        if (cmp != 0) {
+            return false;
+        }
+        // Recursivamente verifica los subárboles izquierdo y derecho
+        return sonIguales(raiz1.left, raiz2.left) && sonIguales(raiz1.right, raiz2.right);
+    }
+
+    private boolean sonIsomorfos(Nodo raiz1, Nodo raiz2) {
+        // Si ambos nodos son nulos, son iguales
+        if (raiz1 == null && raiz2 == null) {
+            return true;
+        }
+        // Si solo uno de los nodos es nulo, los árboles no son iguales
+        if (raiz1 == null || raiz2 == null) {
+            return false;
+        }
+
+        return sonIguales(raiz1.left, raiz2.left) && sonIguales(raiz1.right, raiz2.right);
+    }
+
+    public void preorden() {
+        System.out.println("Recorrido en Preorden:");
+        preorden(root);
+        System.out.println();
+    }
+
+    private void preorden(Nodo raiz) {
+        if (raiz != null) {
+            System.out.print(raiz.key + " ");
+            preorden(raiz.left);
+            preorden(raiz.right);
+        }
+    }
+
+    public void inorden() {
+        System.out.println("Recorrido en Inorden:");
+        inorden(root);
+        System.out.println();
+    }
+
+    private void inorden(Nodo raiz) {
+        if (raiz != null) {
+            inorden(raiz.left);
+            System.out.print(raiz.key + " ");
+            inorden(raiz.right);
+        }
+    }
+
+    public void postorden() {
+        System.out.println("Recorrido en Postorden:");
+        postorden(root);
+        System.out.println();
+    }
+
+    private void postorden(Nodo raiz) {
+        if (raiz != null) {
+            postorden(raiz.left);
+            postorden(raiz.right);
+            System.out.print(raiz.key + " ");
+        }
+    }
+
+//    public int nHojas() {
+//        return nHojas(root);
 //    }
 //
-//    public Iterable<Key> keys(Key lo, Key hi) {
-//        Queue<Key> queue = new Queue<Key>();
-//        keys(root, queue, lo, hi);
-//        return queue;
-//    }
+//    private int nHojas(Nodo raiz) {
 //
-//    private void keys(Nodo raiz, Queue<Key> queue, Key lo, Key hi) {
 //        if (raiz == null) {
-//            return;
+//            return 0;
 //        }
-//        int cmplo = lo.compareTo(raiz.key);
-//        int cmphi = hi.compareTo(raiz.key);
-//        if (cmplo < 0) {
-//            keys(raiz.left, queue, lo, hi);
+//        if (raiz.left == null && raiz.right == null) {
+//            return 1;
 //        }
-//        if (cmplo <= 0 && cmphi >= 0) {
-//            queue.add(raiz.key);
-//        }
-//        if (cmphi > 0) {
-//            keys(raiz.right, queue, lo, hi);
-//        }
+//        return nHojas(raiz.left) + nHojas(raiz.right);
 //    }
+    //    public Iterable<Key> keys() {
+    //        //return keys(min(), max());
+    //        return null;
+    //    }
+    //
+    //    public Iterable<Key> keys(Key lo, Key hi) {
+    //        Queue<Key> queue = new Queue<Key>();
+    //        keys(root, queue, lo, hi);
+    //        return queue;
+    //    }
+    //
+    //    private void keys(Nodo raiz, Queue<Key> queue, Key lo, Key hi) {
+    //        if (raiz == null) {
+    //            return;
+    //        }
+    //        int cmplo = lo.compareTo(raiz.key);
+    //        int cmphi = hi.compareTo(raiz.key);
+    //        if (cmplo < 0) {
+    //            keys(raiz.left, queue, lo, hi);
+    //        }
+    //        if (cmplo <= 0 && cmphi >= 0) {
+    //            queue.add(raiz.key);
+    //        }
+    //        if (cmphi > 0) {
+    //            keys(raiz.right, queue, lo, hi);
+    //        }
+    //    }
     public static void main(String[] args) {
         BST<Integer, String> rara = new BST();
         System.out.println("Size del arbol vacio: " + rara.size());
@@ -407,8 +619,32 @@ public class BST<Key extends Comparable<Key>, Value> implements Iterable<Key> {
         System.out.println("0 es hoja?" + rara.esHoja(0));
         System.out.println("1 es hoja?" + rara.esHoja(1));
         System.out.println("Hay camino entre 2 y 1?" + rara.hayCamino(2, 1));
-        System.out.println("Mostrar camino entre 2 y 1: " + rara.mostrarCamino(2,1));
-        System.out.println("Longitud del camino entre 2 y 1: " +  rara.longitudCamino(2, 1));
+        System.out.println("Mostrar camino entre 2 y 1: " + rara.mostrarCamino(2, 1));
+        System.out.println("Longitud del camino entre 2 y 1: " + rara.longitudCamino(2, 1));
         System.out.println("1 es de descendiente de 2?: " + rara.esDesendiente(2, 1));
+        System.out.println("Altura: " + rara.altura());
+        System.out.println("Peso de la llave 0: " + rara.peso(0));
+        System.out.println("El arbol es completo?: " + rara.esCompleto());
+        System.out.println("Alturamin: " + rara.alturaMin());
+        System.out.println("-------------------------------------------");
+        BST<Integer, String> arbol = new BST<>();
+    
+    // Agregar elementos al árbol
+    arbol.put(4, "4");
+    arbol.put(2, "2");
+    arbol.put(6, "6");
+    arbol.put(1, "1");
+    arbol.put(3, "3");
+    arbol.put(5, "5");
+    arbol.put(7, "7");
+
+    // Mostrar el árbol
+    System.out.println("Árbol original:");
+    arbol.mostrarDatos();
+    
+    // Realizar recorridos
+    arbol.preorden();
+    arbol.inorden();
+    arbol.postorden();
     }
 }
